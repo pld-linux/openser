@@ -21,6 +21,7 @@ BuildRequires:	net-snmp-devel
 BuildRequires:	openssl-devel
 BuildRequires:	perl-devel
 BuildRequires:	radiusclient-ng-devel
+BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	unixODBC-devel
 #BuildRequires:	xmlrpc-c-devel >= 1.10.0
 BuildRequires:	zlib-devel
@@ -135,6 +136,8 @@ Moduł Jabber do OpenSER.
 %setup -q -n %{name}-%{version}-tls
 %patch0 -p1
 
+find -type d -name CVS | xargs rm -rf
+
 %build
 %{__make} all \
 	exclude_modules="%{exclude_modules}" \
@@ -146,8 +149,6 @@ Moduł Jabber do OpenSER.
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{ser,sysconfig,rc.d/init.d}
-
-find . -type d -name CVS -exec rm -rf "{}" ";"
 
 %{__make} install \
 	exclude_modules="%{exclude_modules}" \
@@ -175,17 +176,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add openser
-if [ -f /var/lock/subsys/openser ]; then
-	etc/rc.d/init.d/openser restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/openser start\" to start sip Daemon."
-fi
+%service openser restart "sip Daemon"
 
 %preun
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/openser ]; then
-		/etc/rc.d/init.d/openser stop 1>&2
-fi
+	%service openser stop
 	/sbin/chkconfig --del openser
 fi
 
