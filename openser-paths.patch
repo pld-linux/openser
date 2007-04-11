@@ -1,0 +1,110 @@
+diff -urN openser-1.2.0-tls.org/Makefile openser-1.2.0-tls/Makefile
+--- openser-1.2.0-tls.org/Makefile	2007-03-12 16:22:55.000000000 +0100
++++ openser-1.2.0-tls/Makefile	2007-04-11 08:28:48.800134458 +0200
+@@ -314,12 +314,12 @@
+ 	scripts/mysqldb.sh create
+ 	-@echo "Done"
+ 
+-mk-install-dirs: $(cfg-prefix)/$(cfg-dir) $(bin-prefix)/$(bin-dir) \
++mk-install-dirs: $(cfg-dir) $(bin-prefix)/$(bin-dir) \
+ 			$(modules-prefix)/$(modules-dir) $(doc-prefix)/$(doc-dir) \
+ 			$(man-prefix)/$(man-dir)/man8 $(man-prefix)/$(man-dir)/man5
+ 
+-$(cfg-prefix)/$(cfg-dir): 
+-		mkdir -p $(cfg-prefix)/$(cfg-dir)
++$(cfg-dir): 
++		mkdir -p $(cfg-dir)
+ 
+ $(bin-prefix)/$(bin-dir):
+ 		mkdir -p $(bin-prefix)/$(bin-dir)
+@@ -338,45 +338,45 @@
+ 		mkdir -p $(man-prefix)/$(man-dir)/man5
+ 		
+ # note: on solaris 8 sed: ? or \(...\)* (a.s.o) do not work
+-install-cfg: $(cfg-prefix)/$(cfg-dir)
++install-cfg: $(cfg-dir)
+ 		sed -e "s#/usr/.*lib/$(NAME)/modules/#$(modules-target)#g" \
+-			< etc/$(NAME).cfg > $(cfg-prefix)/$(cfg-dir)$(NAME).cfg.sample0
++			< etc/$(NAME).cfg > $(cfg-dir)$(NAME).cfg.sample0
+ 		sed -e "s#/usr/.*etc/$(NAME)/tls/#$(cfg-target)tls/#g" \
+-			< $(cfg-prefix)/$(cfg-dir)$(NAME).cfg.sample0 \
+-			> $(cfg-prefix)/$(cfg-dir)$(NAME).cfg.sample
+-		rm -fr $(cfg-prefix)/$(cfg-dir)$(NAME).cfg.sample0
+-		chmod 644 $(cfg-prefix)/$(cfg-dir)$(NAME).cfg.sample
++			< $(cfg-dir)$(NAME).cfg.sample0 \
++			> $(cfg-dir)$(NAME).cfg.sample
++		rm -fr $(cfg-dir)$(NAME).cfg.sample0
++		chmod 644 $(cfg-dir)$(NAME).cfg.sample
+ 		if [ -z "${skip_cfg_install}" -a \
+-				! -f $(cfg-prefix)/$(cfg-dir)$(NAME).cfg ]; then \
+-			mv -f $(cfg-prefix)/$(cfg-dir)$(NAME).cfg.sample \
+-				$(cfg-prefix)/$(cfg-dir)$(NAME).cfg; \
++				! -f $(cfg-dir)$(NAME).cfg ]; then \
++			mv -f $(cfg-dir)$(NAME).cfg.sample \
++				$(cfg-dir)$(NAME).cfg; \
+ 		fi
+ 		# radius dictionary
+-		$(INSTALL-TOUCH) $(cfg-prefix)/$(cfg-dir)/dictionary.radius
+-		$(INSTALL-CFG) etc/dictionary.radius $(cfg-prefix)/$(cfg-dir)
++		$(INSTALL-TOUCH) $(cfg-dir)/dictionary.radius
++		$(INSTALL-CFG) etc/dictionary.radius $(cfg-dir)
+ 		# openserctl config
+-		$(INSTALL-TOUCH)   $(cfg-prefix)/$(cfg-dir)/openserctlrc.sample
++		$(INSTALL-TOUCH)   $(cfg-dir)/openserctlrc.sample
+ 		$(INSTALL-CFG) scripts/openserctlrc \
+-			$(cfg-prefix)/$(cfg-dir)/openserctlrc.sample
+-		if [ ! -f $(cfg-prefix)/$(cfg-dir)/openserctlrc ]; then \
+-			mv -f $(cfg-prefix)/$(cfg-dir)/openserctlrc.sample \
+-				$(cfg-prefix)/$(cfg-dir)/openserctlrc; \
++			$(cfg-dir)/openserctlrc.sample
++		if [ ! -f $(cfg-dir)/openserctlrc ]; then \
++			mv -f $(cfg-dir)/openserctlrc.sample \
++				$(cfg-dir)/openserctlrc; \
+ 		fi
+-		#$(INSTALL-CFG) etc/$(NAME).cfg $(cfg-prefix)/$(cfg-dir)
++		#$(INSTALL-CFG) etc/$(NAME).cfg $(cfg-dir)
+ 		if [ "$(TLS)" != "" ] ; then \
+-			mkdir -p $(cfg-prefix)/$(cfg-dir)/tls ; \
+-			mkdir -p $(cfg-prefix)/$(cfg-dir)/tls/rootCA ; \
+-			mkdir -p $(cfg-prefix)/$(cfg-dir)/tls/rootCA/certs ; \
+-			mkdir -p $(cfg-prefix)/$(cfg-dir)/tls/rootCA/private ; \
+-			mkdir -p $(cfg-prefix)/$(cfg-dir)/tls/user ; \
++			mkdir -p $(cfg-dir)/tls ; \
++			mkdir -p $(cfg-dir)/tls/rootCA ; \
++			mkdir -p $(cfg-dir)/tls/rootCA/certs ; \
++			mkdir -p $(cfg-dir)/tls/rootCA/private ; \
++			mkdir -p $(cfg-dir)/tls/user ; \
+ 			(cd etc ; \
+ 			for FILE in tls/* tls/rootCA/* tls/rootCA/certs/* \
+ 					tls/rootCA/private/* tls/user/* ; do \
+ 				if [ -f $$FILE ] ; then \
+ 					$(INSTALL-TOUCH) $$FILE \
+-						$(cfg-prefix)/$(cfg-dir)/$$FILE ; \
++						$(cfg-dir)/$$FILE ; \
+ 					$(INSTALL-CFG) $$FILE \
+-						$(cfg-prefix)/$(cfg-dir)/$$FILE ; \
++						$(cfg-dir)/$$FILE ; \
+ 				fi ;\
+ 			done ) ; \
+ 		fi
+diff -urN openser-1.2.0-tls.org/Makefile.defs openser-1.2.0-tls/Makefile.defs
+--- openser-1.2.0-tls.org/Makefile.defs	2007-03-12 17:39:09.000000000 +0100
++++ openser-1.2.0-tls/Makefile.defs	2007-04-11 08:27:01.758110513 +0200
+@@ -121,7 +121,7 @@
+ SYSBASE ?= /usr
+ 
+ # dirs 
+-cfg-dir = etc/$(MAIN_NAME)/
++cfg-dir = $(basedir)/etc/$(MAIN_NAME)/
+ bin-dir = sbin/
+ 
+ ARCH_B= $(shell echo $(ARCH) | sed -e 's/.*64.*/64b/')
+@@ -192,7 +192,7 @@
+ 
+ 
+ # target dirs for various stuff
+-cfg-target = $(prefix)/$(cfg-dir)
++cfg-target = $(cfg-dir)
+ bin-target = $(prefix)/$(bin-dir)
+ lib-target = $(prefix)/$(lib-dir)
+ modules-target = $(prefix)/$(modules-dir)
