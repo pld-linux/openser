@@ -10,7 +10,9 @@ Source0:	http://www.openser.org/pub/openser/%{version}/src/%{name}-%{version}-tl
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-paths.patch
+Patch1:		%{name}-build.patch
 URL:		http://www.openser.org/
+BuildRequires:	OSPToolkit
 BuildRequires:	bison
 BuildRequires:	expat-devel
 BuildRequires:	flex
@@ -30,8 +32,7 @@ Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # mi_xmlrpc requires xmlrpc-c-devel in version 1.9 only
-# osp needs Open settlement protocol implementation to be packaged (https://sourceforge.net/projects/osp-toolkit/)
-%define	exclude_modules	mi_xmlrpc osp
+%define	exclude_modules	mi_xmlrpc
 
 %description
 SIP Express Router (ser) is a high-performance, configurable, free SIP
@@ -135,6 +136,7 @@ Moduł Jabber do OpenSER.
 %prep
 %setup -q -n %{name}-%{version}-tls
 %patch0 -p1
+%patch1 -p1
 
 find -type d -name CVS | xargs rm -rf
 
@@ -226,6 +228,7 @@ fi
 %attr(755,root,root) %{_libdir}/openser/modules/msilo.so
 %attr(755,root,root) %{_libdir}/openser/modules/nathelper.so
 %attr(755,root,root) %{_libdir}/openser/modules/options.so
+%attr(755,root,root) %{_libdir}/openser/modules/osp.so
 %attr(755,root,root) %{_libdir}/openser/modules/pa.so
 %attr(755,root,root) %{_libdir}/openser/modules/path.so
 %attr(755,root,root) %{_libdir}/openser/modules/pdt.so
