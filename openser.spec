@@ -1,12 +1,12 @@
 Summary:	SIP proxy, redirect and registrar server
 Summary(pl.UTF-8):	Serwer SIP rejestrujący, przekierowujący i robiący proxy
 Name:		openser
-Version:	1.2.0
+Version:	1.2.2
 Release:	1
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.openser.org/pub/openser/%{version}/src/%{name}-%{version}-tls_src.tar.gz
-# Source0-md5:	fbf929ed9d3ef1c3f41e4ebecbc4dd26
+# Source0-md5:	840a0f7e2cc83cebf3701bb32b3ba745
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-paths.patch
@@ -145,7 +145,7 @@ find -type d -name CVS | xargs rm -rf
 	exclude_modules="%{exclude_modules}" \
 	CC="%{__cc}" \
 	PREFIX="%{_prefix}" \
-	CFLAGS="%{rpmcflags} -I/usr/include/xmlrpc-c -Wcast-align -fPIC" \
+	CFLAGS="%{rpmcflags} -Wcast-align -fPIC" \
 	TLS=1
 
 %install
@@ -161,6 +161,11 @@ for i in modules/*; do \
 	i=$(basename $i)
 	[ -f modules/$i/README ] && cp -f modules/$i/README README.$i; \
 done
+
+install -d $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
+install $RPM_BUILD_ROOT%{_docdir}/%{name}/* \
+	$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
+rm -rf  $RPM_BUILD_ROOT%{_docdir}/%{name}
 
 #cd doc/serdev
 #docbook2html serdev.sgml
