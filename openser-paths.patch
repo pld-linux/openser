@@ -1,7 +1,7 @@
-diff -urN openser-1.2.0-tls.org/Makefile openser-1.2.0-tls/Makefile
---- openser-1.2.0-tls.org/Makefile	2007-03-12 16:22:55.000000000 +0100
-+++ openser-1.2.0-tls/Makefile	2007-04-11 08:28:48.800134458 +0200
-@@ -314,12 +314,12 @@
+diff -urN openser-1.2.2-tls.orig/Makefile openser-1.2.2-tls/Makefile
+--- openser-1.2.2-tls.orig/Makefile	2007-08-16 16:23:20.000000000 +0200
++++ openser-1.2.2-tls/Makefile	2007-09-19 15:15:01.000000000 +0200
+@@ -318,12 +318,12 @@
  	scripts/mysqldb.sh create
  	-@echo "Done"
  
@@ -17,7 +17,7 @@ diff -urN openser-1.2.0-tls.org/Makefile openser-1.2.0-tls/Makefile
  
  $(bin-prefix)/$(bin-dir):
  		mkdir -p $(bin-prefix)/$(bin-dir)
-@@ -338,45 +338,45 @@
+@@ -342,43 +342,43 @@
  		mkdir -p $(man-prefix)/$(man-dir)/man5
  		
  # note: on solaris 8 sed: ? or \(...\)* (a.s.o) do not work
@@ -44,14 +44,14 @@ diff -urN openser-1.2.0-tls.org/Makefile openser-1.2.0-tls/Makefile
 +				$(cfg-dir)$(NAME).cfg; \
  		fi
  		# radius dictionary
--		$(INSTALL-TOUCH) $(cfg-prefix)/$(cfg-dir)/dictionary.radius
--		$(INSTALL-CFG) etc/dictionary.radius $(cfg-prefix)/$(cfg-dir)
-+		$(INSTALL-TOUCH) $(cfg-dir)/dictionary.radius
-+		$(INSTALL-CFG) etc/dictionary.radius $(cfg-dir)
+-		$(INSTALL_TOUCH) $(cfg-prefix)/$(cfg-dir)/dictionary.radius
+-		$(INSTALL_CFG) etc/dictionary.radius $(cfg-prefix)/$(cfg-dir)
++		$(INSTALL_TOUCH) $(cfg-dir)/dictionary.radius
++		$(INSTALL_CFG) etc/dictionary.radius $(cfg-dir)
  		# openserctl config
--		$(INSTALL-TOUCH)   $(cfg-prefix)/$(cfg-dir)/openserctlrc.sample
-+		$(INSTALL-TOUCH)   $(cfg-dir)/openserctlrc.sample
- 		$(INSTALL-CFG) scripts/openserctlrc \
+-		$(INSTALL_TOUCH)   $(cfg-prefix)/$(cfg-dir)/openserctlrc.sample
++		$(INSTALL_TOUCH) $(cfg-dir)/openserctlrc.sample
+ 		$(INSTALL_CFG) scripts/openserctlrc \
 -			$(cfg-prefix)/$(cfg-dir)/openserctlrc.sample
 -		if [ ! -f $(cfg-prefix)/$(cfg-dir)/openserctlrc ]; then \
 -			mv -f $(cfg-prefix)/$(cfg-dir)/openserctlrc.sample \
@@ -61,8 +61,8 @@ diff -urN openser-1.2.0-tls.org/Makefile openser-1.2.0-tls/Makefile
 +			mv -f $(cfg-dir)/openserctlrc.sample \
 +				$(cfg-dir)/openserctlrc; \
  		fi
--		#$(INSTALL-CFG) etc/$(NAME).cfg $(cfg-prefix)/$(cfg-dir)
-+		#$(INSTALL-CFG) etc/$(NAME).cfg $(cfg-dir)
+-		#$(INSTALL_CFG) etc/$(NAME).cfg $(cfg-prefix)/$(cfg-dir)
++		#$(INSTALL_CFG) etc/$(NAME).cfg $(cfg-dir)
  		if [ "$(TLS)" != "" ] ; then \
 -			mkdir -p $(cfg-prefix)/$(cfg-dir)/tls ; \
 -			mkdir -p $(cfg-prefix)/$(cfg-dir)/tls/rootCA ; \
@@ -74,23 +74,21 @@ diff -urN openser-1.2.0-tls.org/Makefile openser-1.2.0-tls/Makefile
 +			mkdir -p $(cfg-dir)/tls/rootCA/certs ; \
 +			mkdir -p $(cfg-dir)/tls/rootCA/private ; \
 +			mkdir -p $(cfg-dir)/tls/user ; \
- 			(cd etc ; \
- 			for FILE in tls/* tls/rootCA/* tls/rootCA/certs/* \
- 					tls/rootCA/private/* tls/user/* ; do \
- 				if [ -f $$FILE ] ; then \
- 					$(INSTALL-TOUCH) $$FILE \
+ 			for FILE in $(tls_configs) ; do \
+ 				if [ -f etc/$$FILE ] ; then \
+ 					$(INSTALL_TOUCH) etc/$$FILE \
 -						$(cfg-prefix)/$(cfg-dir)/$$FILE ; \
 +						$(cfg-dir)/$$FILE ; \
- 					$(INSTALL-CFG) $$FILE \
+ 					$(INSTALL_CFG) etc/$$FILE \
 -						$(cfg-prefix)/$(cfg-dir)/$$FILE ; \
 +						$(cfg-dir)/$$FILE ; \
  				fi ;\
- 			done ) ; \
+ 			done ; \
  		fi
-diff -urN openser-1.2.0-tls.org/Makefile.defs openser-1.2.0-tls/Makefile.defs
---- openser-1.2.0-tls.org/Makefile.defs	2007-03-12 17:39:09.000000000 +0100
-+++ openser-1.2.0-tls/Makefile.defs	2007-04-11 08:27:01.758110513 +0200
-@@ -121,7 +121,7 @@
+diff -urN openser-1.2.2-tls.orig/Makefile.defs openser-1.2.2-tls/Makefile.defs
+--- openser-1.2.2-tls.orig/Makefile.defs	2007-08-16 16:23:20.000000000 +0200
++++ openser-1.2.2-tls/Makefile.defs	2007-09-19 15:09:37.000000000 +0200
+@@ -124,7 +124,7 @@
  SYSBASE ?= /usr
  
  # dirs 
@@ -99,7 +97,7 @@ diff -urN openser-1.2.0-tls.org/Makefile.defs openser-1.2.0-tls/Makefile.defs
  bin-dir = sbin/
  
  ARCH_B= $(shell echo $(ARCH) | sed -e 's/.*64.*/64b/')
-@@ -192,7 +192,7 @@
+@@ -195,7 +195,7 @@
  
  
  # target dirs for various stuff
