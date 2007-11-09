@@ -1,3 +1,10 @@
+#
+# Conditional build:
+%bcond_without	mysql		# mysql support
+%bcond_without	pgsql		# PostgreSQL support
+%bcond_without	odbc		# ODBC support
+%bcond_without	radius		# radius support
+#
 Summary:	SIP proxy, redirect and registrar server
 Summary(pl.UTF-8):	Serwer SIP rejestrujący, przekierowujący i robiący proxy
 Name:		openser
@@ -16,15 +23,15 @@ BuildRequires:	OSPToolkit
 BuildRequires:	bison
 BuildRequires:	expat-devel
 BuildRequires:	flex
-BuildRequires:	libpqxx-devel
+%{?with_pgsql:BuildRequires:	libpqxx-devel}
 BuildRequires:	libxml2-devel
-BuildRequires:	mysql-devel
+%{?with_mysql:BuildRequires:	mysql-devel}
 BuildRequires:	net-snmp-devel
 BuildRequires:	openssl-devel
 BuildRequires:	perl-devel
-BuildRequires:	radiusclient-ng-devel
+%{?with_radius:BuildRequires:	radiusclient-ng-devel}
 BuildRequires:	rpmbuild(macros) >= 1.268
-BuildRequires:	unixODBC-devel
+%{?with_odbc:BuildRequires:	unixODBC-devel}
 #BuildRequires:	xmlrpc-c-devel >= 1.10.0
 BuildRequires:	zlib-devel
 Requires(post,preun):	/sbin/chkconfig
@@ -141,8 +148,21 @@ Moduł Jabber do OpenSER.
 find -type d -name CVS | xargs rm -rf
 
 %build
+exclude_modules="%{exclude_modules}"
+%if %{without mysql}
+exclude_modules="$exclude_modules mysql"
+%endif
+%if %{without pgsql}
+exclude_modules="$exclude_modules postgres"
+%endif
+%if %{without odbc}
+exclude_modules="$exclude_modules unixodbc"
+%endif
+%if %{without radius}
+exclude_modules="$exclude_modules auth_radius avp_radius group_radius uri_radius"
+%endif
 %{__make} all \
-	exclude_modules="%{exclude_modules}" \
+	exclude_modules="$exclude_modules" \
 	CC="%{__cc}" \
 	PREFIX="%{_prefix}" \
 	CFLAGS="%{rpmcflags} -Wcast-align -fPIC" \
@@ -152,8 +172,21 @@ find -type d -name CVS | xargs rm -rf
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{ser,sysconfig,rc.d/init.d}
 
+exclude_modules="%{exclude_modules}"
+%if %{without mysql}
+exclude_modules="$exclude_modules mysql"
+%endif
+%if %{without pgsql}
+exclude_modules="$exclude_modules postgres"
+%endif
+%if %{without odbc}
+exclude_modules="$exclude_modules unixodbc"
+%endif
+%if %{without radius}
+exclude_modules="$exclude_modules auth_radius avp_radius group_radius uri_radius"
+%endif
 %{__make} install \
-	exclude_modules="%{exclude_modules}" \
+	exclude_modules="$exclude_modules" \
 	PREFIX="%{_prefix}" \
 	basedir=$RPM_BUILD_ROOT
 
@@ -195,8 +228,12 @@ fi
 %defattr(644,root,root,755)
 %doc README* TODO scripts examples
 %attr(755,root,root) %{_sbindir}/*
+%if %{with mysql}
 %exclude %{_sbindir}/openser_mysql.sh
+%endif
+%if %{with pgsql}
 %exclude %{_sbindir}/openser_postgresql.sh
+%endif
 %dir %{_sysconfdir}/openser
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/openser/openser.cfg
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/openser/openserctlrc
@@ -269,16 +306,21 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/openser/modules/jabber.so
 
+%if %{with mysql}
 %files mysql
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/openser_mysql.sh
 %attr(755,root,root) %{_libdir}/openser/modules/mysql.so
+%endif
 
+%if %{with pgsql}
 %files postgres
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/openser_postgresql.sh
 %attr(755,root,root) %{_libdir}/openser/modules/postgres.so
+%endif
 
+%if %{with radius}
 %files radius
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/openser/dictionary.radius
@@ -286,10 +328,13 @@ fi
 %attr(755,root,root) %{_libdir}/openser/modules/avp_radius.so
 %attr(755,root,root) %{_libdir}/openser/modules/group_radius.so
 %attr(755,root,root) %{_libdir}/openser/modules/uri_radius.so
+%endif
 
+%if %{with odbc}
 %files odbc
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/openser/modules/unixodbc.so
+%endif
 
 %files perl
 %defattr(644,root,root,755)
